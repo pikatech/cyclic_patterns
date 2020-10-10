@@ -71,12 +71,30 @@ set_colors <- c("Alphaproteobacteria" = "purple4", "Gammaproteobacteria"="medium
 )
 
 
-set_colors_phylum <- c("Acidobacteria" ="cyan1",    "Actinobacteria" = "brown",   "Bacteroidetes"  ="orange1",    "BHI80_139" = "lightgreen",        
-                       "Chlamydiae" ="bisque",       "Chloroflexi" ="lightpink",       "Cyanobacteria"  ="#00FFBF",    
-"Elusimicrobia"   = "burlywood",    "Entotheonellaeota" = "pink2",  "Firmicutes" ="gray",        "Hydrogenedentes"="lightgreen",    "Kiritimatiellaeota"="chocolate2", 
-"Nitrospinae" = "mediumpurple4",       "Nitrospirae" ="blue",     
-"Omnitrophicaeota" ="darkorange2",   "Patescibacteria" ="green",   "Planctomycetes"="firebrick2",     "Proteobacteria"  = "purple4",   "Rokubacteria" ="orange1",    
-"Spirochaetes" ="yellow",      "Verrucomicrobia"="red2"
+set_colors_phylum <- c("Acidobacteria" ="cyan1",    
+                       "Actinobacteria" = "brown",   
+                       "Bacteroidetes"  ="orange1",   
+                       "BHI80_139" = "lightgreen",        
+                       "Chlamydiae" ="bisque",      
+                       "Chloroflexi" ="lightpink",      
+                       "Cyanobacteria"  ="#00FFBF",    
+                       "Elusimicrobia"   = "burlywood",    
+                       "Entotheonellaeota" = "pink2",  
+                       "Firmicutes" ="gray",        
+                       "Hydrogenedentes"="lightgreen",    
+                       "Kiritimatiellaeota"="chocolate1", 
+                       "Nitrospinae" = "mediumpurple4",   
+                       "Nitrospirae" ="blue",     
+                       "GAL15" = "white", 
+                       "Acidobacteria"="cyan1", 
+                       "Zixibacteria"="navy",
+                       "Omnitrophicaeota" ="darkorange4",  
+                       "Patescibacteria" ="green",  
+                       "Planctomycetes"="firebrick2",     
+                       "Proteobacteria"  = "purple4",  
+                       "Rokubacteria" ="orange1",    
+                       "Spirochaetes" ="yellow",    
+                       "Verrucomicrobia"="red2"
 )
 
 
@@ -262,7 +280,7 @@ lefse.tbl <- lefse2(lefse_data41, class="Recharge" ,subclass = "Period"
 
 ############################################################################################################################
 #### Now do it in galaxy ###
-# I chose the result with LDA > 3, edit the .lefse_internal_res file (remove the insig. taxa in Notepad ++)
+# I chose the result with LDA > 2, edit the .lefse_internal_res file (remove the insig. taxa in Notepad ++)
 # 1) Search-> mark..-> input "charge"-> tick "bookmark line" -> Mark All 
 # 2) Search->Bookmark -> Remove Unmarked lines
 # upload the edited .lefse_internal_res file into galaxy, specify the format type as "lefse_internal_res"
@@ -278,7 +296,7 @@ lefse.tbl <- lefse2(lefse_data41, class="Recharge" ,subclass = "Period"
 ############################################################################################################################
 
 setwd("/home/yo39qed/time-series analysis/output")
-LDA_H41 <- read.delim("H41/Galaxy72-[B)_LDA_Effect_Size_(LEfSe)_on_data_71].lefse_internal_res", header=F)
+LDA_H41 <- read.delim("H41/sig_Galaxy122-[B)_LDA_Effect_Size_(LEfSe)_on_data_121].txt", header=F)
 
 names(LDA_H41) <- c("Feature", "log_of_the_highest_class_average", "class", "LDA_effect_size", "p-value")
 
@@ -323,7 +341,7 @@ LDA_H41 %>%
                      # ,
                      # "Discharge"
          )) -> filter_3 # with absolute LDA score > 2
-dim(filter_3) # Recharge:121, Discharge:106
+dim(filter_3) # Recharge:128, Discharge:103, total 231
 
 ############### Or we can separate at different taxonomic levels and plot ##### 
 LDA_H41 %>%
@@ -361,8 +379,11 @@ attach(tet2)
 #detach(tet2)
 lb <- str_split_fixed(tet2[order(LDA_effect_size),]$Feature , "\\.", 6)[ ,6] # [, 6] is genus level, [, 5]: family, etc 
 
+unique(tet41$Phylum)
 #########################################################################################
-tet2 %>%
+tet41 <- tet2
+
+tet41 %>%
   ggplot()   +
   theme_pubr()+
   scale_fill_manual(values=set_colors_phylum) +
@@ -394,13 +415,15 @@ tet2 %>%
   xlab("Genus")+
   ylab("LDA effect size")+
   # ggtitle("LEfSe")+
+   theme(legend.position = "none") +
   # theme(plot.margin=unit(c(8,1,1,1), "lines"))+ # top, right, bottom,left
   coord_flip() + annotate("label", y = -2.5, x = 50, size=10,
                           label ="Recharge-depressed", fill="grey", color="white")+
   annotate("label", y = 2, x = 30, size=10,
-           label ="Recharge-favored", fill="orange", color="white") -> p2
+           label ="Recharge-favored", fill="orange", color="white") -> p41
 
-p2
+p41
+ggsave("H41/lefse_with_subclass_genus_H41.pdf", width = 20, height = 20)
 
 ################ Family level #####################
 
@@ -456,10 +479,27 @@ p3
 
 ########################################################
 setwd("/home/yo39qed/time-series analysis/output")
-grid.arrange(p2, p3, nrow=1)
+grid.arrange(p41, p3, nrow=1)
 
 dev.copy(pdf,"H41/lefse_with_subclass_family_and_genus_H41.pdf", width = 40, height = 20)
 dev.off()
 
+
+### Combine LDA (genus level) figures of all three wells
+library("gridExtra")
+library("cowplot")
+# Arrange plots using arrangeGrob
+# returns a gtable (gt)
+gt <- arrangeGrob(p41 ,                              
+                  p43 + theme(legend.position = "none") , 
+                  p52 + theme(legend.position = "none") ,                               
+                  ncol = 2, nrow = 2, 
+                  layout_matrix = rbind(c(1,2), c(1,3)))
+# Add labels to the arranged plots
+p <- as_ggplot(gt)
+p
+
+dev.copy(pdf,"lefse_with_subclass_genus_all_wells.pdf", width = 30, height = 22)
+dev.off()
 
 

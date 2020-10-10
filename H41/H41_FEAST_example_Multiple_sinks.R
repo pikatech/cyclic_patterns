@@ -165,7 +165,7 @@ prop_merged_unknown <-subset(t, Source=="unknown")
 ################################## Mean and SD ######################################
 res <- aggregate(Proportions_est ~ Period, data=prop_merged_unknown, function(x) c(mean = mean(x), sd = sd(x), se=sd(x)/sqrt(length(x)))) 
 res
-# write.table(res, "H41/feast_unknown_source_recharge_H41.csv", sep=";", dec=",", col.names = NA)
+write.table(res, "H41/feast_unknown_source_recharge_H41.csv", sep=";", dec=",", col.names = NA)
 mean(prop_merged_unknown$Proportions_est)
 sd(prop_merged_unknown$Proportions_est)
 # Dunn test for multiple comparisons 

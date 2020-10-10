@@ -71,12 +71,30 @@ set_colors <- c("Alphaproteobacteria" = "purple4", "Gammaproteobacteria"="medium
 )
 
 
-set_colors_phylum <- c("Acidobacteria" ="cyan1",    "Actinobacteria" = "brown",   "Bacteroidetes"  ="orange1",    "BHI80_139" = "lightgreen",        
-                       "Chlamydiae" ="bisque",       "Chloroflexi" ="lightpink",       "Cyanobacteria"  ="#00FFBF",    
-                       "Elusimicrobia"   = "burlywood",    "Entotheonellaeota" = "pink2",  "Firmicutes" ="gray",        "Hydrogenedentes"="lightgreen",    "Kiritimatiellaeota"="chocolate2", 
-                       "Nitrospinae" = "mediumpurple4",       "Nitrospirae" ="blue",     
-                       "Omnitrophicaeota" ="darkorange2",   "Patescibacteria" ="green",   "Planctomycetes"="firebrick2",     "Proteobacteria"  = "purple4",   "Rokubacteria" ="orange1",    
-                       "Spirochaetes" ="yellow",      "Verrucomicrobia"="red2"
+set_colors_phylum <- c("Acidobacteria" ="cyan1",    
+                       "Actinobacteria" = "brown",   
+                       "Bacteroidetes"  ="orange1",   
+                       "BHI80_139" = "lightgreen",        
+                       "Chlamydiae" ="bisque",      
+                       "Chloroflexi" ="lightpink",      
+                       "Cyanobacteria"  ="#00FFBF",    
+                       "Elusimicrobia"   = "burlywood",    
+                       "Entotheonellaeota" = "pink2",  
+                       "Firmicutes" ="gray",        
+                       "Hydrogenedentes"="lightgreen",    
+                       "Kiritimatiellaeota"="chocolate1", 
+                       "Nitrospinae" = "mediumpurple4",   
+                       "Nitrospirae" ="blue",     
+                       "GAL15" = "white", 
+                       "Acidobacteria"="cyan1", 
+                       "Zixibacteria"="navy",
+                       "Omnitrophicaeota" ="darkorange4",  
+                       "Patescibacteria" ="green",  
+                       "Planctomycetes"="firebrick2",     
+                       "Proteobacteria"  = "purple4",  
+                       "Rokubacteria" ="orange1",    
+                       "Spirochaetes" ="yellow",    
+                       "Verrucomicrobia"="red2"
 )
 
 
@@ -354,11 +372,13 @@ attach(tet2)
 lb <- str_split_fixed(tet2[order(LDA_effect_size),]$Feature , "\\.", 6)[ ,6] # [, 6] is genus level, [, 5]: family, etc 
 
 #########################################################################################
-tet2 %>%
+View(tet43)
+tet43 <- tet2
+tet43 %>%
   ggplot()   +
   theme_pubr()+
-  scale_fill_manual(values=set_colors) +
-  geom_bar(aes(x=reorder(Feature,LDA_effect_size),y=LDA_effect_size,fill=Class),color="black",stat="identity")+ 
+  scale_fill_manual(values=set_colors_phylum) +
+  geom_bar(aes(x=reorder(Feature,LDA_effect_size),y=LDA_effect_size,fill=Phylum),color="black",stat="identity")+ 
   geom_hline(yintercept=2, linetype="dashed", 
              color = "orange", size=1) +
   geom_hline(yintercept=1, linetype="dashed", 
@@ -380,6 +400,7 @@ tet2 %>%
   theme(axis.title=element_text(size=20), axis.text=element_text(size=20), 
         legend.text=element_text(size=20),legend.title=element_text(size=20, face="bold"))+
   scale_x_discrete(labels=lb) +
+#  theme(legend.position = "none") +
   scale_y_continuous( breaks = c(-4,-3,-2,-1,0,1,2,3,4)) + 
   theme(legend.position = "right") +  
   #scale_x_discrete(expand = c(0, 2))+
@@ -390,9 +411,9 @@ tet2 %>%
   coord_flip() + annotate("label", y = -2, x = 14, size=10,
                           label ="Recharge-depressed", fill="grey", color="white")+
   annotate("label", y = 2, x = 9, size=10,
-           label ="Recharge-favored", fill="orange", color="white") -> p2
+           label ="Recharge-favored", fill="orange", color="white") -> p43
 
-p2
+p43
 
 setwd("/home/yo39qed/time-series analysis/output")
 ggsave("H43/lefse_with_subclass_genus_H43.pdf", width = 18, height = 12)

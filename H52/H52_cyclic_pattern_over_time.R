@@ -96,7 +96,7 @@ t52_bray_no_point <- ggplot(df52_1, aes(x=Day, y=Bray)) +
         # axis.text=element_blank(),
         # axis.ticks=element_blank() 
   )+
-  scale_x_continuous(breaks=seq(0, max(df52_1$Day), 365))+
+  scale_x_continuous(breaks=seq(0, max(df41_1$Day), 365),  labels = seq(0, 6))+
   geom_vline(xintercept = seq(0, max(df52_1$Day), 365), linetype="dashed", 
                color = "grey", size=0.5)
 
@@ -126,7 +126,7 @@ t52_bray_no_point1 <- ggplot(df52_1, aes(x=Day, y=Bray)) +
         axis.text.y=element_blank(),
         axis.ticks=element_blank() 
   )+
-  scale_x_continuous(breaks=seq(0, max(df52_1$Day), 365))+
+  scale_x_continuous(breaks=seq(0, max(df41_1$Day), 365),  labels = seq(0, 6))+
   geom_vline(xintercept = seq(0, max(df52_1$Day), 365), linetype="dashed", 
              color = "grey", size=0.5)
 
@@ -139,16 +139,20 @@ ggsave("H52/bray/correlation_water_day_bray_no_point_H52_1.jpg", width = 4, heig
 # https://people.maths.bris.ac.uk/~sw15190/mgcv/check-select.pdf
 
 fit <- gam(Bray ~ s(Day, bs = "cs"), data = df52_1) # family: Gassian
-
 summary(fit) # needed
 
 fit$coefficients 
+fit$sp
 # We can use the GCV scores a bit like AIC, smaller values indicated better fitting models.
 # The deviance explained is a bit like R2 for models where sums of squares 
 # doesn't make much sense as a measure of discrepancy between the observations and the fitted values.
 gam.check(fit)
+# Basis dimension (k): the maximum allowable degrees of freedom for smooth terms 
+par(mfrow = c(2,2))
+gam.check(fit)
 plot(fit)
 
+par(mfrow = c(1,1))
 plot(Bray ~ Day, data =df52_1, col = "red",  pch = 16)
 curve(predict(fit, newdata = data.frame(Day = x)), add = TRUE, 
       from = min(df52_1$Day), to = max(df52_1$Day), n = 1e3, lwd = 2)

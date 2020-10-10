@@ -8,7 +8,6 @@ require(zoo)
 library(magrittr)
 library(gganimate)
 
-
 ############## making metadata table ###########################################
 # import all weather, hydrochemistry, temperature and water level data
 

@@ -81,7 +81,7 @@ ht_RechargePeriod <- adonis(data_norm41_bray ~ Recharge + Period + Recharge*Peri
 # This output tells us that our adonis test is significant 
 # so we can reject the null hypothesis that our three countries have the same centroid.
 ht_RechargePeriod
-ht_RechargePeriod$aov.tab$"Pr(>F)" # use the R2 values for VennDiagram
+ht_RechargePeriod$aov.tab # use the R2 values for VennDiagram
 write.table(data.frame(ht_RechargePeriod$aov.tab), "H41/bray/permanova_ht_RechargePeriod_H41.csv", sep=";", dec=",", col.names=NA)
 
 ### Pairwise comparison ##

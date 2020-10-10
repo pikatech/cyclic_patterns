@@ -71,12 +71,30 @@ set_colors <- c("Alphaproteobacteria" = "purple4", "Gammaproteobacteria"="medium
 )
 
 
-set_colors_phylum <- c("Acidobacteria" ="cyan1",    "Actinobacteria" = "brown",   "Bacteroidetes"  ="orange1",    "BHI80_139" = "lightgreen",        
-                       "Chlamydiae" ="bisque",       "Chloroflexi" ="lightpink",       "Cyanobacteria"  ="#00FFBF",    
-                       "Elusimicrobia"   = "burlywood",    "Entotheonellaeota" = "pink2",  "Firmicutes" ="gray",        "Hydrogenedentes"="lightgreen",    "Kiritimatiellaeota"="chocolate2", 
-                       "Nitrospinae" = "mediumpurple4",       "Nitrospirae" ="blue",     
-                       "Omnitrophicaeota" ="darkorange2",   "Patescibacteria" ="green",   "Planctomycetes"="firebrick2",     "Proteobacteria"  = "purple4",   "Rokubacteria" ="orange1",    
-                       "Spirochaetes" ="yellow",      "Verrucomicrobia"="red2"
+set_colors_phylum <- c("Acidobacteria" ="cyan1",    
+                       "Actinobacteria" = "brown",   
+                       "Bacteroidetes"  ="orange1",   
+                       "BHI80_139" = "lightgreen",        
+                       "Chlamydiae" ="bisque",      
+                       "Chloroflexi" ="lightpink",      
+                       "Cyanobacteria"  ="#00FFBF",    
+                       "Elusimicrobia"   = "burlywood",    
+                       "Entotheonellaeota" = "pink2",  
+                       "Firmicutes" ="gray",        
+                       "Hydrogenedentes"="lightgreen",    
+                       "Kiritimatiellaeota"="chocolate1", 
+                       "Nitrospinae" = "mediumpurple4",   
+                       "Nitrospirae" ="blue",     
+                       "GAL15" = "#737373", 
+                       "Acidobacteria"="cyan1", 
+                       "Zixibacteria"="navy",
+                       "Omnitrophicaeota" ="darkorange4",  
+                       "Patescibacteria" ="green",  
+                       "Planctomycetes"="firebrick2",     
+                       "Proteobacteria"  = "purple4",  
+                       "Rokubacteria" ="orange1",    
+                       "Spirochaetes" ="yellow",    
+                       "Verrucomicrobia"="red2"
 )
 
 
@@ -356,11 +374,18 @@ attach(tet2)
 lb <- str_split_fixed(tet2[order(LDA_effect_size),]$Feature , "\\.", 6)[ ,6] # [, 6] is genus level, [, 5]: family, etc 
 
 #########################################################################################
-tet2 %>%
+tet52 <- tet2
+unique(tet52$Phylum)
+unique(tet43$Phylum)
+unique(tet41$Phylum)
+
+unique(tet41$Phylum)
+
+tet52 %>%
   ggplot()   +
   theme_pubr()+
-  scale_fill_manual(values=set_colors) +
-  geom_bar(aes(x=reorder(Feature,LDA_effect_size),y=LDA_effect_size,fill=Class),color="black",stat="identity")+ 
+  scale_fill_manual(values=set_colors_phylum) +
+  geom_bar(aes(x=reorder(Feature,LDA_effect_size),y=LDA_effect_size,fill=Phylum),color="black",stat="identity")+ 
   geom_hline(yintercept=2, linetype="dashed", 
              color = "orange", size=1) +
   geom_hline(yintercept=1, linetype="dashed", 
@@ -388,15 +413,32 @@ tet2 %>%
   xlab("Genus")+
   ylab("LDA effect size")+
   # ggtitle("LEfSe")+
+ # theme(legend.position = "none") +
   # theme(plot.margin=unit(c(8,1,1,1), "lines"))+ # top, right, bottom,left
   coord_flip() + annotate("label", y = -2, x = 14, size=10,
                           label ="Recharge-depressed", fill="grey", color="white")+
   annotate("label", y = 2, x = 9, size=10,
-           label ="Recharge-favored", fill="orange", color="white") -> p2
+           label ="Recharge-favored", fill="orange", color="white") -> p52
 
-p2
+p52
 
 setwd("/home/yo39qed/time-series analysis/output")
 ggsave("H52/lefse_with_subclass_genus_H52.pdf", width = 18, height = 12)
 ggsave("H52/lefse_with_subclass_genus_H52.png", width = 18, height = 12)
 
+### Combine LDA (genus level) figures of all three wells
+library("gridExtra")
+library("cowplot")
+# Arrange plots using arrangeGrob
+# returns a gtable (gt)
+gt <- arrangeGrob(p41 ,                              
+                  p43 + theme(legend.position = "none") , 
+                  p52 + theme(legend.position = "none") ,                               
+                  ncol = 2, nrow = 2, 
+                  layout_matrix = rbind(c(1,2), c(1,3)))
+# Add labels to the arranged plots
+p <- as_ggplot(gt)
+p
+
+dev.copy(pdf,"lefse_with_subclass_genus_all_wells.pdf", width = 30, height = 22)
+dev.off()

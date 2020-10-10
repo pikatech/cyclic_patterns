@@ -96,7 +96,7 @@ t43_bray_no_point <- ggplot(df43_1, aes(x=Day, y=Bray)) +
         # axis.text=element_blank(),
         # axis.ticks=element_blank() 
   )+
-  scale_x_continuous(breaks=seq(0, max(df43_1$Day), 365))+
+  scale_x_continuous(breaks=seq(0, max(df41_1$Day), 365),  labels = seq(0, 6))+
   geom_vline(xintercept = seq(0, max(df43_1$Day), 365), linetype="dashed", 
                color = "grey", size=0.5)
 
@@ -126,7 +126,7 @@ t43_bray_no_point1 <- ggplot(df43_1, aes(x=Day, y=Bray)) +
         axis.text.y=element_blank(),
         axis.ticks=element_blank() 
   )+
-  scale_x_continuous(breaks=seq(0, max(df43_1$Day), 365))+
+  scale_x_continuous(breaks=seq(0, max(df41_1$Day), 365),  labels = seq(0, 6))+
   geom_vline(xintercept = seq(0, max(df43_1$Day), 365), linetype="dashed", 
              color = "grey", size=0.5)
 
@@ -143,6 +143,7 @@ fit <- gam(Bray ~ s(Day, bs = "cs"), data = df43_1) # family: Gassian
 summary(fit) # needed
 
 fit$coefficients 
+fit$sp
 # We can use the GCV scores a bit like AIC, smaller values indicated better fitting models.
 # The deviance explained is a bit like R2 for models where sums of squares 
 # doesn't make much sense as a measure of discrepancy between the observations and the fitted values.

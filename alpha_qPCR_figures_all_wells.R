@@ -1,3 +1,5 @@
+rm(list = ls())
+
 setwd("/home/yo39qed/time-series analysis/output")
 #saveRDS()
 library(phyloseq)
@@ -46,8 +48,8 @@ vegan_otu <- function(physeq) {
 
 # Load data
 load("/home/yo39qed/time-series analysis/output/H41/data_norm41.phyloseq")
-load("/home/yo39qed/time-series analysis/output/H41/data_norm43.phyloseq")
-load("/home/yo39qed/time-series analysis/output/H41/data_norm52.phyloseq")
+load("/home/yo39qed/time-series analysis/output/H43/data_norm43.phyloseq")
+load("/home/yo39qed/time-series analysis/output/H52/data_norm52.phyloseq")
 
 #######   alpha diversity  analysis ##########
 
@@ -60,11 +62,12 @@ summary_H43$Recharge <- factor(summary_H43$Recharge, levels = c("Discharge", "Re
 summary_H52 <- data.frame(sample_data(data_norm52))
 summary_H52$Recharge <- factor(summary_H52$Recharge, levels = c("Discharge", "Recharge"))
 
-summary <- rbind(summary_H41, summary_H43, summary_H52)
+summary <- do.call("rbind", list(summary_H41, summary_H43, summary_H52))
 write.table(summary, "summary_univariate_Wells.csv", sep=";", dec=",", col.names = NA)
 
 
 #################################### Shannon #################################
+summary$Period <- factor(summary$Period, levels = c("P13", "P14", "P15", "P16", "P17", "P18", "P19"))
 # 1) Recharge
 res <- aggregate(Shannon ~ Recharge + Well, data=summary, function(x) c(mean = mean(x), sd = sd(x), se=sd(x)/sqrt(length(x)))) 
 res
@@ -91,7 +94,7 @@ ggexport(p_recharge, filename = 'shannon_Recharge_wells.pdf', width = 8, height 
 
 ##############################  Recharge + period  ########################
 res <- aggregate(Shannon ~ Recharge + Period + Well, data=summary, function(x) c(mean = mean(x), sd = sd(x), se=sd(x)/sqrt(length(x)))) 
-res
+round(res,1)
 write.table(res, "mean_Shannon_recharge_period_Wells.csv", sep=";", dec=",", col.names = NA)
 
 res <- aggregate(Shannon ~ Period + Well, data=summary, function(x) c(mean = mean(x), sd = sd(x), se=sd(x)/sqrt(length(x)))) 
@@ -288,7 +291,7 @@ ggexport(p_final, filename = 'qPCR_PeriodRecharge_wells.pdf', width = 14, height
 
 ### Pairwise comparison
 library(FSA)
-PT<-dunnTest(qPCR~PeriodRecharge,summary, method="bh")
+PT<-dunnTest(qPCR~Period,subset(summary, Well=="H41"), method="bh")
 PT<-PT$res
 
 library(rcompanion) #To have R convert this table to a compact letter display for us
